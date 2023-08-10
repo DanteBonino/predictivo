@@ -32,7 +32,7 @@ recibioMensaje(Mensaje, Receptor):-
     mensaje(Mensaje,PosibleRecepto),
     receptor(PosibleRecepto, Receptor).
 
-receptor(Receptor,Receptor):-%Esto me genera dudas pq, justo se da que filtro abarca a todos los que reciben mensajes solos. Pero si alguno no tuviese filtro no se generaria.
+receptor(Receptor,Receptor):-%Esto me genera dudas pq, no sé si es la mejor forma para diferenciar los casos en los que no receptor no es una lista.
     not(member(_,Receptor)).
 receptor(Receptores, Receptor):-
     member(Receptor, Receptores).

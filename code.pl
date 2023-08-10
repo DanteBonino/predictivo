@@ -57,3 +57,66 @@ tieneMasDe20CaracteresOEmpiezaConPregunta(Mensaje):-
 tieneMasDeNCaracteres(Mensaje, Minimo):-
     length(Mensaje, Cantidad),
     Cantidad > Minimo.
+
+%Punto 3:
+esAceptable(Palabra,Persona):-
+    palabra(Palabra),
+    recibioMensaje(_,Persona),
+    forall(filtro(Persona,Filtro), superaElFiltro(Palabra, Filtro, Persona)).
+
+palabra(Palabra):-
+    mensaje(Mensaje,_),
+    member(Palabra, Mensaje).
+
+superaElFiltro(Palabra, ignorar(Palabras), _):-
+    not(member(Palabra,Palabras)).
+superaElFiltro(Palabra,soloFormal,_):-
+    demasiadoFormal(Mensaje),
+    member(Palabra, Mensaje).
+superaElFiltro(Palabra, masDe(Cantidad), Persona):-
+    tasaDeUso(Palabra, Persona, TasaDeUso),
+    TasaDeUso > Cantidad.
+
+tasaDeUso(Palabra, Persona, TasaDeUso):-
+    cantidadDeVecesQueApareceLaPalabra(Palabra,Persona,Cantidad),
+    cantidadDeVecesQueApareceLaPalabra(Palabra,_, CantidadGeneral),
+    TasaDeUso is Cantidad / CantidadGeneral.
+
+cantidadDeVecesQueApareceLaPalabra(Palabra, Persona, Cantidad):-
+    findall(Persona, recibioPalabra(Palabra, Persona), Personas),
+    sum_list(Personas, Cantidad).
+
+recibioPalabra(Palabra, Persona):-
+    recibioMensaje(Mensaje, Persona),
+    member(Palabra, Mensaje).
+    
+
+%Punto 4:
+dicenLoMismo(Mensaje, OtroMensaje):-
+    mensaje(Mensaje,_),
+    mensaje(OtroMensaje,_),
+    forall(member(Palabra, Mensaje), hayEquivalenteEnSuPosicion(Palabra, Mensaje, OtroMensaje)).
+
+hayEquivalenteEnSuPosicion(Palabra, MensajeDeReferencia, Mensaje):-
+    nth0(Posicion,MensajeDeReferencia,Palabra),
+    nth0(Posicion,Mensaje, OtraPalabra),
+    esEquivalente(Palabra, OtraPalabra).
+
+esEquivalente(Palabra,Palabra).
+esEquivalente(UnaPalabra, OtraPalabra):-
+    algunaEsAbreviatura(UnaPalabra, OtraPalabra).
+
+algunaEsAbreviatura(Palabra,OtraPalabra):-
+    abreviatura(Palabra, OtraPalabra).
+algunaEsAbreviatura(Palabra, OtraPalabra):-
+    abreviatura(OtraPalabra,Palabra).
+
+%Version 2:
+dicenLoMismoV2(Mensaje,OtroMensaje):-
+    mensaje(Mensaje,_),
+    mensaje(OtroMensaje,_),
+    forall(palabrasEnMismaPosicion(Mensaje,OtroMensaje, Palabra, OtraPalabra), esEquivalente(Palabra, OtraPalabra)).
+
+palabrasEnMismaPosicion(Mensaje, OtroMensaje, Palabra, OtraPalabra):-
+    nth0(Posicion,Mensaje,Palabra),
+    nth0(Posicion,OtroMensaje, OtraPalabra).

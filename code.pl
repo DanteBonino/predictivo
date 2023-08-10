@@ -120,3 +120,48 @@ dicenLoMismoV2(Mensaje,OtroMensaje):-
 palabrasEnMismaPosicion(Mensaje, OtroMensaje, Palabra, OtraPalabra):-
     nth0(Posicion,Mensaje,Palabra),
     nth0(Posicion,OtroMensaje, OtraPalabra).
+
+%Punto 5
+fraseCelebre(FraseCelebre):-
+    mensaje(FraseCelebre,_),
+    forall(contacto(Receptor), recibioElMismoMensaje(FraseCelebre,Receptor)).
+
+contacto(Receptor):-
+    recibioMensaje(_,Receptor).
+
+recibioElMismoMensaje(FraseCelebre, Receptor):-
+    mensajeEquivalente(FraseCelebre, MensajeEquivalente),
+    recibioMensaje(MensajeEquivalente, Receptor).
+
+mensajeEquivalente(Mensaje, Mensaje).
+mensajeEquivalente(Mensaje, MensajeEquivalente):-
+    dicenLoMismoV2(Mensaje, MensajeEquivalente).
+
+%Punto 6:
+prediccion(Mensaje, Receptor, Prediccion):-
+    not(fraseCelebre(Mensaje)),
+    prediccionPotencial(Mensaje, Prediccion),
+    esAceptableParaTodos(Receptor, Prediccion).
+
+prediccionPotencial(Mensaje, Prediccion):-
+    ultimaPalabra(Mensaje, UltimaPalabra),
+    palabraQueSeUsoDespuesDe(Prediccion, UltimaPalabra).
+
+ultimaPalabra(Mensaje, UltimaPalabra):-
+    length(Mensaje, CantidadPalabras),
+    nth1(CantidadPalabras, Mensaje, UltimaPalabra).
+
+palabraQueSeUsoDespuesDe(PalabraSiguiente, PalabraDeReferencia):-
+    mensajeQueTienePalabra(Mensaje, PalabraDeReferencia),
+    nth0(PalabraDeReferencia,Mensaje, PosicionPalabraRef),
+    nth0(PalabraSiguiente, Mensaje, PosicionPalabra),
+    PosicionPalabra is PosicionPalabraRef + 1.
+
+mensajeQueTienePalabra(Mensaje, Palabra):-
+    mensaje(Mensaje,_),
+    member(Palabra, Mensaje).
+
+esAceptableParaTodos(Receptor,Palabra):-
+    esAceptable(Palabra, Receptor).
+esAceptableParaTodos(Receptores, Palabra):-
+    forall(member(Receptor, Receptores), esAceptable(Palabra,Receptor)).

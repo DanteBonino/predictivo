@@ -36,3 +36,24 @@ receptor(Receptor,Receptor):-
     filtro(Receptor,_).
 receptor(Receptores, Receptor):-
     member(Receptor, Receptores).
+
+%Punto 2:
+demasiadoFormal(Mensaje):-
+    noTieneAbreviatura(Mensaje),
+    tieneMasDe20CaracteresOEmpiezaConPregunta(Mensaje).
+
+tieneAbreviatura(Mensaje):-
+    abreviatura(Abreviatura,_),
+    member(Abreviatura, Mensaje).
+noTieneAbreviatura(Mensaje):-
+    mensaje(Mensaje,_),
+    not(tieneAbreviatura(Mensaje)).
+
+tieneMasDe20CaracteresOEmpiezaConPregunta(Mensaje):-
+    tieneMasDeNCaracteres(Mensaje,20).
+tieneMasDe20CaracteresOEmpiezaConPregunta(Mensaje):-
+    nth0(0,Mensaje,'¿').
+
+tieneMasDeNCaracteres(Mensaje, Minimo):-
+    length(Mensaje, Cantidad),
+    Cantidad > Minimo.

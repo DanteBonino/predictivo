@@ -32,8 +32,8 @@ recibioMensaje(Mensaje, Receptor):-
     mensaje(Mensaje,PosibleRecepto),
     receptor(PosibleRecepto, Receptor).
 
-receptor(Receptor,Receptor):-
-    filtro(Receptor,_).
+receptor(Receptor,Receptor):-%Esto me genera dudas pq, justo se da que filtro abarca a todos los que reciben mensajes solos. Pero si alguno no tuviese filtro no se generaria.
+    not(member(_,Receptor)).
 receptor(Receptores, Receptor):-
     member(Receptor, Receptores).
 
@@ -65,8 +65,7 @@ esAceptable(Palabra,Persona):-
     forall(filtro(Persona,Filtro), superaElFiltro(Palabra, Filtro, Persona)).
 
 palabra(Palabra):-
-    mensaje(Mensaje,_),
-    member(Palabra, Mensaje).
+    mensajeQueTienePalabra(_,Palabra).
 
 superaElFiltro(Palabra, ignorar(Palabras), _):-
     not(member(Palabra,Palabras)).
@@ -84,7 +83,7 @@ tasaDeUso(Palabra, Persona, TasaDeUso):-
 
 cantidadDeVecesQueApareceLaPalabra(Palabra, Persona, Cantidad):-
     findall(Persona, recibioPalabra(Palabra, Persona), Personas),
-    sum_list(Personas, Cantidad).
+    length(Personas, Cantidad).
 
 recibioPalabra(Palabra, Persona):-
     recibioMensaje(Mensaje, Persona),
@@ -153,9 +152,9 @@ ultimaPalabra(Mensaje, UltimaPalabra):-
 
 palabraQueSeUsoDespuesDe(PalabraSiguiente, PalabraDeReferencia):-
     mensajeQueTienePalabra(Mensaje, PalabraDeReferencia),
-    nth0(PalabraDeReferencia,Mensaje, PosicionPalabraRef),
-    nth0(PalabraSiguiente, Mensaje, PosicionPalabra),
-    PosicionPalabra is PosicionPalabraRef + 1.
+    nth0(PosicionPalabraRef,Mensaje, PalabraDeReferencia),
+    nth0(PosicionSiguiente, Mensaje, PalabraSiguiente),
+    PosicionSiguiente is PosicionPalabraRef + 1.
 
 mensajeQueTienePalabra(Mensaje, Palabra):-
     mensaje(Mensaje,_),
@@ -164,4 +163,5 @@ mensajeQueTienePalabra(Mensaje, Palabra):-
 esAceptableParaTodos(Receptor,Palabra):-
     esAceptable(Palabra, Receptor).
 esAceptableParaTodos(Receptores, Palabra):-
+    member(_,Receptores),
     forall(member(Receptor, Receptores), esAceptable(Palabra,Receptor)).
